@@ -1,279 +1,296 @@
-﻿ // ArrayFile.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
-#include <ios>
 #include <vector>
-
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
-typedef double* pDouble;
-/*
-*   ConsoleInputArrayDouble
-*   
-*/
-int ConsoleInputSizeArray(const int sizeMax)
+/////////////////////////////////////////////////////
+// 3.1 Ввід масиву з консолі + запис у текстовий файл
+/////////////////////////////////////////////////////
+
+void inputArrayConsole(double*& arr, int& n)
 {
-    int size = 0; 
-    do {
-        cout << " Input size Array ( 0< 1 < " << sizeMax << " ) ";
-        cin >> size;
-    } while (size <= 0 || size >= sizeMax);
-    return size;
-}
-/*
-*   ConsoleInputArrayDouble
-*
-*/
-int ConsoleInputArray(int sizeMax, double A[])
-{
-    int size = ConsoleInputSizeArray(sizeMax);
-        for (int i = 0; i < size; i++) {
-        cout << " Array[ " << i << "] "; cin >> A[i];
-    }
-    return size;
+    cout << "Enter array size: ";
+    cin >> n;
+
+    arr = new double[n];
+
+    cout << "Enter elements:\n";
+
+    for (int i = 0; i < n; i++)
+        cin >> arr[i];
 }
 
-/*
-*   RndInputArrayDouble
-*
-*/
-int RndInputArray(int sizeMax, double A[])
+void writeArrayText(double* arr, int n, string filename)
 {
-    int size = ConsoleInputSizeArray(sizeMax);
-    int r1=0, r2=0;
-    srand(size);
+    ofstream fout(filename);
 
-    for (int i = 0; i < size; i++) {
-        r1 = rand();
-        r2 = rand();
-        A[i] = 100.0 * r1;
-        A[i] = A[i] / (1.0 + r2);
-        cout << A[i] << "   ";
-    }
-    return size;
-}
-
-int ConsoleInputDynamicArrayNew(int sizeMax, pDouble &pA)
-{
-    int size = ConsoleInputSizeArray(sizeMax);
-    pA = new double[size];
-    if (pA == nullptr) { return 0; }
-    for (int i = 0; i < size; i++) {
-        cout << " Array[ " << i << "] "; cin >> pA[i];
-    }
-    return size;
-}
-
-int ConsoleInputDynamicArray_calloc(int sizeMax, pDouble& pA)
-{
-    int size = ConsoleInputSizeArray(sizeMax);
-    pA = (double*)calloc(size, sizeof(double));      // pA = (double*)malloc(size * sizeof(double)); 
-    if (pA == nullptr) { return 0; }
-    for (int i = 0; i < size; i++) {
-        cout << " Array[ " << i << "] "; cin >> pA[i];
-    }
-    return size;
-}
-
-void ConsoleInputVector(int sizeMax, vector<double> &A)
-{
-    int size = ConsoleInputSizeArray(sizeMax);
-    double d;
-    for (int i = 0; i < size; i++) {
-        cout << " Array[ " << i << "] "; cin >> d; A.push_back(d);
-    }
-    return ;
-}
-
-
-/*
-*  WriteArrayTextFile 
-*
-*/
-
-void WriteArrayTextFile(int n, double *arr, const char *fileName )
-{
-    ofstream fout(fileName);
-    if (fout.fail()) return;
     fout << n << endl;
+
     for (int i = 0; i < n; i++)
-        fout << arr[i] << "   ";
-    fout.close(); //
+        fout << arr[i] << " ";
+
+    fout.close();
 }
-/*
-*  ReadArrayTextFile
-*
-*/
 
+/////////////////////////////////////////////////////
+// читання масиву з текстового файлу
+/////////////////////////////////////////////////////
 
-int ReadArrayTextFile(int n, double* arr, const char* fileName)
+double* readArrayText(string filename, int& n)
 {
-    int size;
-    ifstream fin(fileName);
-    if (fin.fail()) return 0;
-    fin >> size;
-    if (size <= 0) return 0;
-    if (size > n) size = n;   
+    ifstream fin(filename);
+
+    fin >> n;
+
+    double* arr = new double[n];
+
     for (int i = 0; i < n; i++)
-       fin>> arr[i];
+        fin >> arr[i];
+
     fin.close();
-    return size;
-    
+
+    return arr;
 }
 
+/////////////////////////////////////////////////////
+// 3.2 випадковий масив + бінарний файл
+/////////////////////////////////////////////////////
 
-void WriteArrayBinFile(int n, double* arr, const char* fileName)
+void randomArrayBinary(string filename)
 {
-    //ios_base
-    ofstream bfout(fileName, ios_base::binary);
-    if (bfout.fail()) return;
-    bfout.write((const char*)&n, sizeof(int));
-    std::streamsize  cn = static_cast<std::streamsize>(n) *sizeof(double);
-    bfout.write((const char*)arr, cn);
-    bfout.close();
-}
-
-int ReadArrayBinFile(int n, double* arr, const char* fileName)
-{
-    int size=0;
-    ifstream bfin(fileName, ios_base::binary);
-    if (bfin.fail()) return 0;
-    bfin.read((char*)&size, sizeof(int));
-    if (size <= 0) return 0;
-    if (size > n) size = n;
-    bfin.read((char*)arr, static_cast<std::streamsize>(size) * sizeof(double));
-    bfin.close();
-    // ssdhs
-    return size;
-}
-
-void ShowMainMenu()
-{
-    cout << "    Main Menu  \n";
-    cout << "    1.  Task 1  \n";
-    cout << "    2.  Task 2  \n";
-    cout << "    3.  Task 3  \n";
-  }
-
-void MenuTask()
-{
-    cout << "     Menu Task   \n";
-    cout << "    1.  Local array  \n";
-    cout << "    2.  Dynamic array 1 \n";
-    cout << "    3.  Dynamic array 2  new \n"; 
-    cout << "    4.  Dynamic array : vector \n";
-    cout << "    5.  Exit \n";
-}
-
-void MenuInput()
-{
-    cout << "     Menu Input   \n";
-    cout << "    1.  Console all \n";
-    cout << "    2.  Console - size, array - random \n";
-    cout << "    3.  File 1.txt \n";
-    cout << "    4.  bb    \n";
-    cout << "    5.  Exit \n";
-}
-
-
-/*
-* Задано одновимірний масив А розміру 2N. 
-* Побудувати два масиви В і С розміру N, 
-* включивши  у масив В елементи масиву А з парними індексами,
-* а у С - з непарними.
-*****************
-*  A - in 
-*  B, C - out 
-*/
-void  TestVariant(int N, double* A, double* B, double* C) {
-    for (int i = 0; i < N; i++) {
-        B[i] = A[2 * i];
-        C[i] = A[2 * i + 1];
-    }
-}
-/*
-*  Task  Var
-* 
-* 
-*/
-void TaskV()
-{
-    char ch = '5',t;
-    do {
-        system("cls");
-        MenuTask();
-        ch = getchar();
-        t=getchar();
-            switch (ch) {
-             case '1': cout << " 1 "; break;
-             case '2': cout << " 2 "; break;
-            //
-            case '5': return;
-            }
-        cout << " Press any key and enter\n";
-        ch = getchar();
-        } while (ch != 27);
-    
-}
-
-void ArrayLocal()
-{
-    double A[1000], B[500], C[500];
     int n;
-    char ch = '5',t;
-    do {
-        system("cls");
-        MenuTask();
-        ch = getchar();
-        t = getchar();
-        switch (ch) {
-        case '1': cout << " 1 "; break;
-        case '2': cout << " 2 "; break;
-            //
-        case '5': return;
-        }
-        cout << " Press any key and enter\n";
-        ch = getchar();
-    } while (ch != 27);
 
+    cout << "Enter size: ";
+    cin >> n;
+
+    double* arr = new double[n];
+
+    srand(time(0));
+
+    for (int i = 0; i < n; i++)
+        arr[i] = rand() % 100 - 50;
+
+    ofstream fout(filename, ios::binary);
+
+    fout.write((char*)&n, sizeof(int));
+    fout.write((char*)arr, n * sizeof(double));
+
+    fout.close();
+
+    delete[] arr;
 }
 
+/////////////////////////////////////////////////////
+// TASK 1
+// максимальний серед від’ємних + індекс
+/////////////////////////////////////////////////////
+
+void task1(double* arr, int n)
+{
+    double maxNeg = -1e9;
+    int index = -1;
+
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] < 0 && arr[i] > maxNeg)
+        {
+            maxNeg = arr[i];
+            index = i;
+        }
+    }
+
+    ofstream fout("result1.txt");
+
+    if (index == -1)
+    {
+        cout << "No negative elements\n";
+        fout << "No negative elements";
+    }
+    else
+    {
+        cout << "Max negative = " << maxNeg << endl;
+        cout << "Index = " << index << endl;
+
+        fout << "Max negative = " << maxNeg << endl;
+        fout << "Index = " << index;
+    }
+
+    fout.close();
+}
+
+/////////////////////////////////////////////////////
+// TASK 2
+/////////////////////////////////////////////////////
+
+void task2(double* arr, int n)
+{
+    double B, A1;
+
+    cout << "Enter B: ";
+    cin >> B;
+
+    cout << "Enter A1: ";
+    cin >> A1;
+
+    int limit = n;
+
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] > A1)
+        {
+            limit = i;
+            break;
+        }
+    }
+
+    double minVal = 1e9;
+    bool found = false;
+
+    for (int i = 0; i < limit; i++)
+    {
+        if (arr[i] < B && arr[i] < minVal)
+        {
+            minVal = arr[i];
+            found = true;
+        }
+    }
+
+    ofstream fout("result2.txt");
+
+    if (!found)
+    {
+        cout << "Element not found\n";
+        fout << "Element not found";
+    }
+    else
+    {
+        cout << "Min element = " << minVal << endl;
+        fout << "Min element = " << minVal;
+    }
+
+    fout.close();
+}
+
+/////////////////////////////////////////////////////
+// TASK 3
+// точки всередині кола
+/////////////////////////////////////////////////////
+
+void task3(double* arr, int n)
+{
+    double r;
+
+    cout << "Enter radius r: ";
+    cin >> r;
+
+    int count = 0;
+
+    for (int i = 0; i < n - 1; i += 2)
+    {
+        double x = arr[i];
+        double y = arr[i + 1];
+
+        if (x * x + y * y <= r * r)
+            count++;
+    }
+
+    ofstream fout("result3.txt");
+
+    cout << "Points inside circle = " << count << endl;
+    fout << "Points inside circle = " << count;
+
+    fout.close();
+}
+
+/////////////////////////////////////////////////////
+// 3.4 читання у vector
+/////////////////////////////////////////////////////
+
+void readToVector(string filename)
+{
+    ifstream fin(filename);
+
+    int n;
+    fin >> n;
+
+    vector<double> v(n);
+
+    for (int i = 0; i < n; i++)
+        fin >> v[i];
+
+    cout << "Vector elements:\n";
+
+    for (double x : v)
+        cout << x << " ";
+
+    cout << endl;
+
+    fin.close();
+}
+
+/////////////////////////////////////////////////////
+// MENU
+/////////////////////////////////////////////////////
 
 int main()
-{ 
-    
-    
-    
-    const int MAX_SIZE = 560;
-    std::cout << "Hello World!\n";
-    ShowMainMenu();
-    /*
-    double A[MAX_SIZE], B[MAX_SIZE],C[MAX_SIZE];
-    int n,m;
-    n = RndInputArray(MAX_SIZE, A);
-    WriteArrayTextFile(n, A, "1.txt");
-    m = ReadArrayTextFile(MAX_SIZE, B, "1.txt");
-    cout << " \n m= " << m << endl;
-    for (int i = 0; i < m; i++)
-        cout << B[i] << "   ";
-    WriteArrayBinFile(n, A, "1.bin");
-    m = ReadArrayBinFile(MAX_SIZE, C, "1.bin");
-    cout << " \n m= " << m << endl;
-    for (int i = 0; i < m; i++)
-        cout << C[i] << "   ";
-    cout << "\n  Vector \n";
-    vector<double> vA;
-    ConsoleInputVector(MAX_SIZE, vA);
-    for (auto v : vA) {
-        cout << v << "   ";
-    }
-*/
-    TaskV();
-    return 1;
+{
+    double* arr = nullptr;
+    int n = 0;
 
+    int choice;
+
+    do
+    {
+        cout << "\nMENU\n";
+        cout << "1 - Input array -> text file\n";
+        cout << "2 - Random array -> binary file\n";
+        cout << "3 - Task 1\n";
+        cout << "4 - Task 2\n";
+        cout << "5 - Task 3\n";
+        cout << "6 - Read file to vector\n";
+        cout << "0 - Exit\n";
+
+        cin >> choice;
+
+        switch (choice)
+        {
+
+        case 1:
+            inputArrayConsole(arr, n);
+            writeArrayText(arr, n, "array.txt");
+            break;
+
+        case 2:
+            randomArrayBinary("array.bin");
+            break;
+
+        case 3:
+            arr = readArrayText("array.txt", n);
+            task1(arr, n);
+            break;
+
+        case 4:
+            arr = readArrayText("array.txt", n);
+            task2(arr, n);
+            break;
+
+        case 5:
+            arr = readArrayText("array.txt", n);
+            task3(arr, n);
+            break;
+
+        case 6:
+            readToVector("array.txt");
+            break;
+
+        }
+
+    } while (choice != 0);
+
+    delete[] arr;
+
+    return 0;
 }
-
