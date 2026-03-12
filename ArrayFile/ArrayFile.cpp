@@ -261,25 +261,31 @@ int main()
         case 1:
             inputArrayConsole(arr, n);
             writeArrayText(arr, n, "array.txt");
+            if(arr!=nullptr)  { delete[] arr; arr =nullptr;}
+            
             break;
 
         case 2:
             randomArrayBinary("array.bin");
+            
             break;
 
         case 3:
             arr = readArrayText("array.txt", n);
             task1(arr, n);
+                if(arr!=nullptr)  { delete[] arr; arr =nullptr;}
             break;
 
         case 4:
             arr = readArrayText("array.txt", n);
             task2(arr, n);
+                if(arr!=nullptr)  { delete[] arr; arr =nullptr;}
             break;
 
         case 5:
             arr = readArrayText("array.txt", n);
             task3(arr, n);
+                if(arr!=nullptr)  { delete[] arr; arr =nullptr;}
             break;
 
         case 6:
@@ -290,7 +296,7 @@ int main()
 
     } while (choice != 0);
 
-    delete[] arr;
+   if(arr!=nullptr) delete[] arr;
 
     return 0;
 }
