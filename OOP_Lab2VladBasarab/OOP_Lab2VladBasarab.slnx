@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="OOP_Lab2VladBasarab/OOP_Lab2VladBasarab.vcxproj" />
+</Solution>
